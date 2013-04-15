@@ -27,6 +27,8 @@
 		<mvn.compilerplugin.version>3.1</mvn.compilerplugin.version>
 		<mvn.sourceplugin.version>2.2.1</mvn.sourceplugin.version>
 		<mvn.jarplugin.version>2.4</mvn.jarplugin.version>
+		<mvn.releaseplugin.version>2.3.2</mvn.releaseplugin.version>
+		<mvn.versionsplugin.version>2.0</mvn.versionsplugin.version>
 	</properties>
 
 	<developers>
@@ -49,6 +51,19 @@
 
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>${mvn.releaseplugin.version}</version>
+				<configuration>
+					<autoVersionSubmodules>true</autoVersionSubmodules>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>versions-maven-plugin</artifactId>
+				<version>${mvn.versionsplugin.version}</version>
+			</plugin>
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
