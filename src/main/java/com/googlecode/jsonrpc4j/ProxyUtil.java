@@ -1,5 +1,8 @@
 package com.googlecode.jsonrpc4j;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -12,15 +15,13 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * Utilities for create client proxies.
  */
 public abstract class ProxyUtil {
 
-	private static final Logger LOGGER = Logger.getLogger(ProxyUtil.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(ProxyUtil.class);
 
 	/**
 	 * Creates a composite service using all of the given
@@ -76,9 +77,7 @@ public abstract class ProxyUtil {
 			// find a service for this interface
 			for (Object o : services) {
 				if (clazz.isInstance(o)) {
-					if (LOGGER.isLoggable(Level.FINE)) {
-						LOGGER.fine("Using "+o.getClass().getName()+" for "+clazz.getName());
-					}
+					LOG.debug("Using " + o.getClass().getName() + " for " + clazz.getName());
 					serviceMap.put(clazz, o);
 					break;
 				}

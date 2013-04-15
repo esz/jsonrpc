@@ -1,12 +1,12 @@
 package com.googlecode.jsonrpc4j.loadtest;
 
-import java.util.logging.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author Eduard Szente
  */
 public class JsonRpcServiceImpl implements JsonRpcService {
 	public void doSomething() {
-		Logger.getLogger(JsonRpcServiceImpl.class.getName()).info("doSomething()");
+		LoggerFactory.getLogger(JsonRpcServiceImpl.class).info("doSomething()");
 	}
 }

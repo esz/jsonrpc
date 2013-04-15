@@ -3,11 +3,11 @@ package com.googlecode.jsonrpc4j;
 import java.lang.reflect.Proxy;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A multiple service dispatcher that supports JSON-RPC "method" names
@@ -22,9 +22,9 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  * </pre>
  * An example of using this class is:
  * <code>
- *    JsonRpcMultiServer rpcServer = new JsonRpcMultiServer();
- *    rpcServer.addService("Foo", new FooService())
- *             .addService("Bar", new BarService());
+ * JsonRpcMultiServer rpcServer = new JsonRpcMultiServer();
+ * rpcServer.addService("Foo", new FooService())
+ * .addService("Bar", new BarService());
  * </code>
  * A client can then call a <i>test(String, String)</i> method on the Foo service
  * like this:
@@ -39,7 +39,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  */
 public class JsonRpcMultiServer extends JsonRpcServer {
 
-	private static final Logger LOGGER = Logger.getLogger(JsonRpcMultiServer.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(JsonRpcMultiServer.class);
 
 	private Map<String, Object> handlerMap;
 	private Map<String, Class<?>> interfaceMap;
@@ -77,11 +77,11 @@ public class JsonRpcMultiServer extends JsonRpcServer {
 	protected Class<?>[] getHandlerInterfaces(String serviceName) {
 		Class<?> remoteInterface = interfaceMap.get(serviceName);
 		if (remoteInterface != null) {
-			return new Class<?>[] {remoteInterface};
+			return new Class<?>[]{remoteInterface};
 		} else if (Proxy.isProxyClass(getHandler(serviceName).getClass())) {
 			return getHandler(serviceName).getClass().getInterfaces();
 		} else {
-			return new Class<?>[] {getHandler(serviceName).getClass()};
+			return new Class<?>[]{getHandler(serviceName).getClass()};
 		}
 	}
 
@@ -96,7 +96,7 @@ public class JsonRpcMultiServer extends JsonRpcServer {
 	protected Object getHandler(String serviceName) {
 		Object handler = handlerMap.get(serviceName);
 		if (handler == null) {
-			LOGGER.log(Level.SEVERE, "Service '" + serviceName + "' is not registered in this multi-server");
+			LOG.error("Service '" + serviceName + "' is not registered in this multi-server");
 			throw new RuntimeException("Service '" + serviceName + "' does not exist");
 		}
 		return handler;
@@ -111,7 +111,7 @@ public class JsonRpcMultiServer extends JsonRpcServer {
 	 */
 	@Override
 	protected String getServiceName(JsonNode methodNode) {
-		String methodName = (methodNode!=null && !methodNode.isNull()) ? methodNode.asText() : null;
+		String methodName = (methodNode != null && !methodNode.isNull()) ? methodNode.asText() : null;
 		if (methodName != null) {
 			int ndx = methodName.indexOf('.');
 			if (ndx > 0) {
@@ -129,7 +129,7 @@ public class JsonRpcMultiServer extends JsonRpcServer {
 	 */
 	@Override
 	protected String getMethodName(JsonNode methodNode) {
-		String methodName = (methodNode!=null && !methodNode.isNull()) ? methodNode.asText() : null;
+		String methodName = (methodNode != null && !methodNode.isNull()) ? methodNode.asText() : null;
 		if (methodName != null) {
 			int ndx = methodName.indexOf('.');
 			if (ndx > 0) {

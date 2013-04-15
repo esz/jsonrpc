@@ -5,13 +5,13 @@ import static org.junit.Assert.*;
 import java.net.InetAddress;
 import java.net.ServerSocket;
 import java.net.Socket;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.net.ServerSocketFactory;
 
 import org.junit.Before;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StreamServerTest {
 
@@ -139,16 +139,16 @@ public class StreamServerTest {
 	}
 
 	private class ServiceImpl implements Service {
-		private final Logger LOGGER = Logger.getLogger(ServiceImpl.class.getName());
+		private final Logger LOG = LoggerFactory.getLogger(ServiceImpl.class);
 		private int val;
 
 		public String hello(String whatever) {
-			LOGGER.log(Level.INFO, "server: hello("+whatever+")");
+			LOG.info("server: hello(" + whatever + ")");
 			return "hello "+whatever;
 		}
 
 		public int inc() {
-			LOGGER.log(Level.INFO, "server: inc():"+val);
+			LOG.info("server: inc():" + val);
 			return val++;
 		}
 

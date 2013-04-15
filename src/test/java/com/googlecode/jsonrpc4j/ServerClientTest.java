@@ -7,9 +7,6 @@ import java.io.OutputStream;
 import java.io.PipedInputStream;
 import java.io.PipedOutputStream;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.logging.ConsoleHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.jmock.Expectations;
 import org.jmock.Mockery;
@@ -41,11 +38,6 @@ public class ServerClientTest {
 		throws Exception {
 		cl = ClassLoader.getSystemClassLoader();
 
-		ConsoleHandler handler = new ConsoleHandler();
-		handler.setLevel(Level.ALL);
-		Logger.getLogger("").addHandler(handler);
-		Logger.getLogger(JsonRpcServer.class.getName()).setLevel(Level.ALL);
-		Logger.getLogger(JsonRpcClient.class.getName()).setLevel(Level.ALL);
 		jsonRpcServer = new JsonRpcServer(serviceMock, Service.class);
 		jsonRpcClient = new JsonRpcClient();
 

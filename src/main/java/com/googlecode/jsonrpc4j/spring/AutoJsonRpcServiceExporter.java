@@ -7,8 +7,9 @@ import static org.springframework.util.ClassUtils.getAllInterfacesForClass;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.logging.Logger;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.config.BeanDefinition;
@@ -35,7 +36,7 @@ import com.googlecode.jsonrpc4j.JsonRpcService;
 public class AutoJsonRpcServiceExporter
 	implements BeanFactoryPostProcessor {
 
-	private static final Logger LOG = Logger.getLogger(AutoJsonRpcServiceExporter.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(AutoJsonRpcServiceExporter.class);
 
 	private static final String PATH_PREFIX = "/";
 
@@ -72,14 +73,13 @@ public class AutoJsonRpcServiceExporter
 			JsonRpcService jsonRpcPath = beanFactory.findAnnotationOnBean(beanName, JsonRpcService.class);
 			if (jsonRpcPath != null) {
 				String pathValue = jsonRpcPath.value();
-				LOG.fine(
-					format("Found JSON-RPC path '%s' for bean [%s].",
-					pathValue, beanName));
+				LOG.debug(format("Found JSON-RPC path '%s' for bean [%s].",
+									pathValue, beanName));
 				if (serviceBeanNames.containsKey(pathValue)) {
 					String otherBeanName = serviceBeanNames.get(pathValue);
-					LOG.warning(format(
-						"Duplicate JSON-RPC path specification: found %s on both [%s] and [%s].",
-						pathValue, beanName, otherBeanName));
+					LOG.warn(format(
+											"Duplicate JSON-RPC path specification: found %s on both [%s] and [%s].",
+											pathValue, beanName, otherBeanName));
 				}
 				serviceBeanNames.put(pathValue, beanName);
 			}
@@ -113,9 +113,9 @@ public class AutoJsonRpcServiceExporter
 			getBeanInterfaces(serviceBeanDefinition, dlbf.getBeanClassLoader())) {
 			if (iface.isAnnotationPresent(JsonRpcService.class)) {
 				String serviceInterface = iface.getName();
-				LOG.fine(format(
-					"Registering interface '%s' for JSON-RPC bean [%s].",
-					serviceInterface, serviceBeanName));
+				LOG.debug(format(
+									"Registering interface '%s' for JSON-RPC bean [%s].",
+									serviceInterface, serviceBeanName));
 				builder.addPropertyValue("serviceInterface", serviceInterface);
 				break;
 			}

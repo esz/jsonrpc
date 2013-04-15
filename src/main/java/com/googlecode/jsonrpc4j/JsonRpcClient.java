@@ -7,8 +7,6 @@ import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Map;
 import java.util.Random;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JavaType;
@@ -17,13 +15,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * A JSON-RPC client.
  */
 public class JsonRpcClient {
 
-	private static final Logger LOGGER = Logger.getLogger(JsonRpcClient.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(JsonRpcClient.class);
 
 	private static final String JSON_RPC_VERSION = "2.0";
 
@@ -239,9 +239,7 @@ public class JsonRpcClient {
 
 		// read the response
 		JsonNode response = mapper.readTree(new NoCloseInputStream(ips));
-		if (LOGGER.isLoggable(Level.FINE)) {
-			LOGGER.log(Level.FINE, "JSON-PRC Response: "+response.toString());
-		}
+		LOG.debug("JSON-PRC Response: {}", response.toString());
 
 		// bail on invalid response
 		if (!response.isObject()) {
@@ -272,14 +270,14 @@ public class JsonRpcClient {
 			&& !jsonObject.get("result").isNull()
 			&& jsonObject.get("result")!=null) {
 			if (returnType==null) {
-				LOGGER.warning(
+				LOG.warn(
 					"Server returned result but returnType is null");
 				return null;
 			}
-			
+
 			JsonParser returnJsonParser = mapper.treeAsTokens(jsonObject.get("result"));
 			JavaType returnJavaType = TypeFactory.defaultInstance().constructType(returnType);
-			
+
 			return mapper.readValue(returnJsonParser, returnJavaType);
 		}
 
@@ -328,7 +326,7 @@ public class JsonRpcClient {
 	/**
 	 * Writes a JSON-RPC notification to the given
 	 * {@link OutputStream}.
-	 * 
+	 *
 	 * @see #writeRequest(String, Object, OutputStream, String)
 	 * @param methodName the method to invoke
 	 * @param argument the method argument
@@ -352,17 +350,17 @@ public class JsonRpcClient {
 	private void internalWriteRequest(
 		String methodName, Object arguments, OutputStream ops, String id)
 		throws IOException {
-		
+
 		// create the request
 		ObjectNode request = mapper.createObjectNode();
-		
+
 		// add id
 		if (id!=null) { request.put("id", id); }
-		
+
 		// add protocol and method
 		request.put("jsonrpc", JSON_RPC_VERSION);
 		request.put("method", methodName);
-		
+
 		// object array args
 		if (arguments!=null && arguments.getClass().isArray()) {
 			Object[] args = Object[].class.cast(arguments);
@@ -376,7 +374,7 @@ public class JsonRpcClient {
 				}
 				request.put("params", paramsNode);
 			}
-		
+
 		// collection args
 		} else if (arguments!=null && Collection.class.isInstance(arguments)) {
 			Collection<?> args = Collection.class.cast(arguments);
@@ -390,7 +388,7 @@ public class JsonRpcClient {
 				}
 				request.put("params", paramsNode);
 			}
-			
+
 		// map args
 		} else if (arguments!=null && Map.class.isInstance(arguments)) {
 			if (!Map.class.cast(arguments).isEmpty()) {
@@ -406,9 +404,7 @@ public class JsonRpcClient {
 		if (this.requestListener!=null) {
 			this.requestListener.onBeforeRequestSent(this, request);
 		}
-		if (LOGGER.isLoggable(Level.FINE)) {
-			LOGGER.log(Level.FINE, "JSON-PRC Request: "+request.toString());
-		}
+		LOG.debug("JSON-PRC Request: {}", request.toString());
 
 		// post the json data;
 		writeAndFlushValue(ops, request);
@@ -426,7 +422,7 @@ public class JsonRpcClient {
 		mapper.writeValue(new NoCloseOutputStream(ops), value);
 		ops.flush();
 	}
-	
+
 	/**
 	 * Returns the {@link ObjectMapper} that the client
 	 * is using for JSON marshalling.

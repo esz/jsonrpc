@@ -20,6 +20,8 @@
 		<junit.version>4.10</junit.version>
 		<jmock.version>2.5.1</jmock.version>
 		<jetty.version>9.0.0.RC0</jetty.version>
+		<logback.version>1.0.9</logback.version>
+		<slf4j.version>1.7.2</slf4j.version>
 		<!-- plugin versions -->
 		<mvn.buildnumberplugin.version>1.1</mvn.buildnumberplugin.version>
 		<mvn.compilerplugin.version>3.1</mvn.compilerplugin.version>
@@ -169,6 +171,25 @@
 			<artifactId>httpcore-nio</artifactId>
 			<version>${httpcomponents.version}</version>
 			<optional>true</optional>
+		</dependency>
+
+		<!-- logging -->
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-classic</artifactId>
+			<version>${logback.version}</version>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>ch.qos.logback</groupId>
+			<artifactId>logback-core</artifactId>
+			<version>${logback.version}</version>
+			<optional>true</optional>
+		</dependency>
+		<dependency>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-api</artifactId>
+			<version>${slf4j.version}</version>
 		</dependency>
 
 		<!-- test -->

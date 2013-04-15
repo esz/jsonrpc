@@ -1,5 +1,8 @@
 package com.googlecode.jsonrpc4j;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
@@ -12,8 +15,6 @@ import java.util.concurrent.LinkedBlockingQueue;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.net.ServerSocketFactory;
 import javax.net.ssl.SSLException;
@@ -25,7 +26,7 @@ import javax.net.ssl.SSLException;
  */
 public class StreamServer {
 
-	private static final Logger LOGGER = Logger.getLogger(StreamServer.class.getName());
+	private static final Logger LOG = LoggerFactory.getLogger(StreamServer.class);
 
 	private static final long SERVER_SOCKET_SO_TIMEOUT	= 5000;
 
@@ -96,10 +97,9 @@ public class StreamServer {
 		}
 
 		// we're starting
-		LOGGER.log(Level.INFO,
-			"StreamServer starting "
-			+serverSocket.getInetAddress()
-			+":"+serverSocket.getLocalPort());
+		LOG.info("StreamServer starting "
+			+ serverSocket.getInetAddress()
+			+ ":" + serverSocket.getLocalPort());
 
 		// start the server
 		keepRunning.set(true);
@@ -142,7 +142,7 @@ public class StreamServer {
 			keepRunning.set(false);
 			
 		} catch (InterruptedException e) {
-			LOGGER.log(Level.SEVERE, "InterruptedException while waiting for termination", e);
+			LOG.error("InterruptedException while waiting for termination", e);
 			throw e;
 		}
 	}
@@ -169,8 +169,7 @@ public class StreamServer {
 					clientSocket = serverSocket.accept();
 
 					// log the connection
-					LOGGER.log(Level.INFO, 
-						"Connection from "+clientSocket.getInetAddress()+":"+clientSocket.getPort());
+					LOG.info("Connection from " + clientSocket.getInetAddress() + ":" + clientSocket.getPort());
 
 					// spawn a new Server for the next connection
 					// and break out of the server loop
@@ -181,7 +180,7 @@ public class StreamServer {
 					// this is expected because of so_timeout
 
 				} catch(SSLException ssle) {
-					LOGGER.log(Level.SEVERE, "SSLException while listening for clients, terminating", ssle);
+					LOG.error("SSLException while listening for clients, terminating", ssle);
 					break;
 					
 				} catch(IOException ioe) {
@@ -189,7 +188,7 @@ public class StreamServer {
 					if (SocketException.class.isInstance(ioe) && !keepRunning.get()) {
 						break;
 					}
-					LOGGER.log(Level.SEVERE, "Exception while listening for clients", ioe);
+					LOG.error("Exception while listening for clients", ioe);
 				}
 			}
 
@@ -201,7 +200,7 @@ public class StreamServer {
 				input = clientSocket.getInputStream();
 				output = clientSocket.getOutputStream();
 			} catch (IOException e) {
-				LOGGER.log(Level.SEVERE, "Client socket failed", e);
+				LOG.error("Client socket failed", e);
 				return;
 			}
 
@@ -215,9 +214,9 @@ public class StreamServer {
 				} catch (Throwable t) {
 					errors++;
 					if (errors<maxClientErrors) {
-						LOGGER.log(Level.SEVERE, "Exception while handling request", t);
+						LOG.error("Exception while handling request", t);
 					} else {
-						LOGGER.log(Level.SEVERE, "Closing client connection due to repeated errors", t);
+						LOG.error("Closing client connection due to repeated errors", t);
 						break;
 					}
 				}

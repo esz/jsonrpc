@@ -15,8 +15,6 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.atomic.AtomicLong;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.net.ssl.SSLContext;
 
@@ -63,6 +61,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.fasterxml.jackson.databind.type.TypeFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Implements an asynchronous JSON-RPC 2.0 HTTP client. This class has a
@@ -93,8 +93,8 @@ import com.fasterxml.jackson.databind.type.TypeFactory;
  * @author Brett Wooldridge
  */
 public class JsonRpcHttpAsyncClient {
-	private static final Logger LOGGER = Logger
-			.getLogger(JsonRpcHttpAsyncClient.class.getName());
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(JsonRpcHttpAsyncClient.class);
 
 	private static final String JSON_RPC_VERSION = "2.0";
 
@@ -398,9 +398,7 @@ public class JsonRpcHttpAsyncClient {
 			request.put("params", mapper.valueToTree(arguments));
 		}
 
-		if (LOGGER.isLoggable(Level.FINE)) {
-			LOGGER.log(Level.FINE, "JSON-PRC Request: " + request.toString());
-		}
+		LOGGER.trace("JSON-PRC Request: {}", request.toString());
 
 		ByteArrayOutputStream baos = new ByteArrayOutputStream(512);
 		mapper.writeValue(baos, request);
@@ -436,9 +434,7 @@ public class JsonRpcHttpAsyncClient {
 
 		// read the response
 		JsonNode response = mapper.readTree(new NoCloseInputStream(ips));
-		if (LOGGER.isLoggable(Level.FINE)) {
-			LOGGER.log(Level.FINE, "JSON-PRC Response: " + response.toString());
-		}
+		LOGGER.trace("JSON-PRC Response: {}", response.toString());
 
 		// bail on invalid response
 		if (!response.isObject()) {
