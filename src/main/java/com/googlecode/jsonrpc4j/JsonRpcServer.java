@@ -217,7 +217,6 @@ public class JsonRpcServer {
 		JsonNode jsonNode = null;
 		try {
 			jsonNode = mapper.readTree(new NoCloseInputStream(ips));
-			LOG.debug("Server Incoming Request: {}", jsonNode.toString());
 		} catch (JsonParseException e) {
 			LOG.warn("Couldn't parse incoming request!");
 			writeAndFlushValue(ops, createErrorResponse(
@@ -921,7 +920,7 @@ public class JsonRpcServer {
 	 */
 	private void writeAndFlushValue(OutputStream ops, Object value)
 		throws IOException {
-		LOG.debug("Server Response: {}", value);
+		LOG.debug("Response: {}", value);
 		mapper.writeValue(new NoCloseOutputStream(ops), value);
 		ops.flush();
 	}
