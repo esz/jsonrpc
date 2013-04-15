@@ -40,6 +40,11 @@
 		</developer>
 	</developers>
 
+	<scm>
+		<connection>https://github.com/esz/jsonrpc.git</connection>
+		<developerConnection>git@github.com:esz/jsonrpc.git</developerConnection>
+	</scm>
+
 	<build>
 		<plugins>
 			<plugin>
