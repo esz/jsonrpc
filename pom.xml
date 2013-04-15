@@ -46,7 +46,7 @@
 
 	<scm>
 		<connection>scm:git:https://github.com/esz/jsonrpc.git</connection>
-		<developerConnection>scm:git:ssh://git@github.com:esz/jsonrpc.git</developerConnection>
+		<developerConnection>scm:git:git@github.com:esz/jsonrpc.git</developerConnection>
 	</scm>
 
 	<build>
