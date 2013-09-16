@@ -4,9 +4,12 @@ import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
+import com.googlecode.jsonrpc4j.HttpHeaderResolver;
 import org.aopalliance.intercept.MethodInterceptor;
 import org.aopalliance.intercept.MethodInvocation;
 import org.springframework.aop.framework.ProxyFactory;
@@ -42,6 +45,8 @@ public class JsonProxyFactoryBean
 	private Map<String, String>	extraHttpHeaders	= new HashMap<String, String>();
 	private ApplicationContext	applicationContext;
 
+	private List<HttpHeaderResolver> headerResolvers = new ArrayList<HttpHeaderResolver>();
+
 	/**
 	 * {@inheritDoc}
 	 */
@@ -71,7 +76,7 @@ public class JsonProxyFactoryBean
 
 		// create JsonRpcHttpClient
 		try {
-			jsonRpcHttpClient = new JsonRpcHttpClient(objectMapper, new URL(getServiceUrl()), extraHttpHeaders);
+			jsonRpcHttpClient = new JsonRpcHttpClient(objectMapper, new URL(getServiceUrl()), extraHttpHeaders, headerResolvers);
 			jsonRpcHttpClient.setRequestListener(requestListener);
 		} catch (MalformedURLException mue) {
 			throw new RuntimeException(mue);
@@ -163,4 +168,7 @@ public class JsonProxyFactoryBean
 		this.useNamedParams = useNamedParams;
 	}
 
+	public void setHeaderResolvers(List<HttpHeaderResolver> headerResolvers) {
+		this.headerResolvers = headerResolvers;
+	}
 }

@@ -7,8 +7,10 @@ import java.lang.reflect.Type;
 import java.net.HttpURLConnection;
 import java.net.Proxy;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 
@@ -20,65 +22,67 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * A JSON-RPC client that uses the HTTP protocol.
- *
  */
 public class JsonRpcHttpClient
 	extends JsonRpcClient {
 
 	private URL serviceUrl;
 
-	private Proxy connectionProxy 				= Proxy.NO_PROXY;
-	private int connectionTimeoutMillis		= 60 * 1000;
-	private int readTimeoutMillis				= 60 * 1000 * 2;
-	private SSLContext sslContext 				= null;
-	private HostnameVerifier hostNameVerifier 	= null;
-	private Map<String, String> headers			= new HashMap<String, String>();
+	private Proxy connectionProxy = Proxy.NO_PROXY;
+	private int connectionTimeoutMillis = 60 * 1000;
+	private int readTimeoutMillis = 60 * 1000 * 2;
+	private SSLContext sslContext = null;
+	private HostnameVerifier hostNameVerifier = null;
+	private Map<String, String> headers = new HashMap<String, String>();
+
+	private List<HttpHeaderResolver> headerResolvers;
 
 	/**
 	 * Creates the {@link JsonRpcHttpClient} bound to the given {@code serviceUrl}.
 	 * The headers provided in the {@code headers} map are added to every request
 	 * made to the {@code serviceUrl}.
-	 * 
-	 * @param mapper the {@link ObjectMapper} to use for json<->java conversion
+	 *
+	 * @param mapper     the {@link ObjectMapper} to use for json<->java conversion
 	 * @param serviceUrl the service end-point URL
-	 * @param headers the headers
+	 * @param headers    the headers
 	 */
-	public JsonRpcHttpClient(ObjectMapper mapper, URL serviceUrl, Map<String, String> headers) {
+	public JsonRpcHttpClient(ObjectMapper mapper, URL serviceUrl, Map<String, String> headers, List<HttpHeaderResolver> headerResolvers) {
 		super(mapper);
 		this.serviceUrl = serviceUrl;
 		this.headers.putAll(headers);
+		this.headerResolvers = headerResolvers;
 	}
 
 	/**
 	 * Creates the {@link JsonRpcHttpClient} bound to the given {@code serviceUrl}.
 	 * The headers provided in the {@code headers} map are added to every request
 	 * made to the {@code serviceUrl}.
-	 * 
+	 *
 	 * @param serviceUrl the service end-point URL
-	 * @param headers the headers
+	 * @param headers    the headers
 	 */
 	public JsonRpcHttpClient(URL serviceUrl, Map<String, String> headers) {
-		this(new ObjectMapper(), serviceUrl, headers);
+		this(new ObjectMapper(), serviceUrl, headers, new ArrayList<HttpHeaderResolver>(0));
 	}
 
 	/**
 	 * Creates the {@link JsonRpcHttpClient} bound to the given {@code serviceUrl}.
 	 * The headers provided in the {@code headers} map are added to every request
 	 * made to the {@code serviceUrl}.
-	 * 
+	 *
 	 * @param serviceUrl the service end-point URL
 	 */
 	public JsonRpcHttpClient(URL serviceUrl) {
-		this(new ObjectMapper(), serviceUrl, new HashMap<String, String>());
+		this(new ObjectMapper(), serviceUrl, new HashMap<String, String>(), new ArrayList<HttpHeaderResolver>(0));
 	}
 
 	/**
 	 * Invokes the given method with the given argument.
-	 * 
-	 * @see JsonRpcClient#writeRequest(String, Object, java.io.OutputStream, String)
+	 *
 	 * @param methodName the name of the method to invoke
-	 * @param arguments the arguments to the method
+	 * @param arguments  the arguments to the method
 	 * @throws Throwable on error
+	 * @see JsonRpcClient#writeRequest(String, Object, java.io.OutputStream, String)
 	 */
 	public void invoke(String methodName, Object argument)
 		throws Throwable {
@@ -88,13 +92,13 @@ public class JsonRpcHttpClient
 	/**
 	 * Invokes the given method with the given arguments and returns
 	 * an object of the given type, or null if void.
-	 * 
-	 * @see JsonRpcClient#writeRequest(String, Object, java.io.OutputStream, String)
+	 *
 	 * @param methodName the name of the method to invoke
-	 * @param argument the arguments to the method
+	 * @param argument   the arguments to the method
 	 * @param returnType the return type
 	 * @return the return value
 	 * @throws Throwable on error
+	 * @see JsonRpcClient#writeRequest(String, Object, java.io.OutputStream, String)
 	 */
 	public Object invoke(
 		String methodName, Object argument, Type returnType)
@@ -105,37 +109,41 @@ public class JsonRpcHttpClient
 	/**
 	 * Invokes the given method with the given arguments and returns
 	 * an object of the given type, or null if void.
-	 * 
-	 * @see JsonRpcClient#writeRequest(String, Object, java.io.OutputStream, String)
+	 *
 	 * @param methodName the name of the method to invoke
-	 * @param argument the arguments to the method
+	 * @param argument   the arguments to the method
 	 * @param returnType the return type
 	 * @return the return value
 	 * @throws Throwable on error
+	 * @see JsonRpcClient#writeRequest(String, Object, java.io.OutputStream, String)
 	 */
 	@SuppressWarnings("unchecked")
 	public <T> T invoke(
 		String methodName, Object argument, Class<T> clazz)
 		throws Throwable {
-		return (T)invoke(methodName, argument, Type.class.cast(clazz));
+		return (T) invoke(methodName, argument, Type.class.cast(clazz));
 	}
 
 	/**
 	 * Invokes the given method with the given arguments and returns
 	 * an object of the given type, or null if void.
-	 * 
-	 * @see JsonRpcClient#writeRequest(String, Object, java.io.OutputStream, String)
-	 * @param methodName the name of the method to invoke
-	 * @param arguments the arguments to the method
-	 * @param returnType the return type
+	 *
+	 * @param methodName   the name of the method to invoke
+	 * @param arguments    the arguments to the method
+	 * @param returnType   the return type
 	 * @param extraHeaders extra headers to add to the request
 	 * @return the return value
 	 * @throws Throwable on error
+	 * @see JsonRpcClient#writeRequest(String, Object, java.io.OutputStream, String)
 	 */
 	public Object invoke(
 		String methodName, Object argument, Type returnType,
 		Map<String, String> extraHeaders)
 		throws Throwable {
+
+		for (HttpHeaderResolver headerResolver : headerResolvers) {
+			extraHeaders.putAll(headerResolver.resolveHeaders());
+		}
 
 		// create URLConnection
 		HttpURLConnection con = prepareConnection(extraHeaders);
@@ -161,34 +169,35 @@ public class JsonRpcHttpClient
 	/**
 	 * Invokes the given method with the given arguments and returns
 	 * an object of the given type, or null if void.
-	 * 
-	 * @see JsonRpcClient#writeRequest(String, Object, java.io.OutputStream, String)
-	 * @param methodName the name of the method to invoke
-	 * @param arguments the arguments to the method
-	 * @param returnType the return type
+	 *
+	 * @param methodName   the name of the method to invoke
+	 * @param arguments    the arguments to the method
+	 * @param returnType   the return type
 	 * @param extraHeaders extra headers to add to the request
 	 * @return the return value
 	 * @throws Throwable on error
+	 * @see JsonRpcClient#writeRequest(String, Object, java.io.OutputStream, String)
 	 */
 	@SuppressWarnings("unchecked")
 	public <T> T invoke(
 		String methodName, Object argument, Class<T> clazz,
 		Map<String, String> extraHeaders)
 		throws Throwable {
-		return (T)invoke(methodName, argument, Type.class.cast(clazz), extraHeaders);
+		return (T) invoke(methodName, argument, Type.class.cast(clazz), extraHeaders);
 	}
 
 	/**
 	 * Prepares a connection to the server.
+	 *
 	 * @param extraHeaders extra headers to add to the request
 	 * @return the unopened connection
-	 * @throws IOException 
+	 * @throws IOException
 	 */
 	protected HttpURLConnection prepareConnection(Map<String, String> extraHeaders)
 		throws IOException {
-		
+
 		// create URLConnection
-		HttpURLConnection con = (HttpURLConnection)serviceUrl.openConnection(connectionProxy);
+		HttpURLConnection con = (HttpURLConnection) serviceUrl.openConnection(connectionProxy);
 		con.setConnectTimeout(connectionTimeoutMillis);
 		con.setReadTimeout(readTimeoutMillis);
 		con.setAllowUserInteraction(false);
