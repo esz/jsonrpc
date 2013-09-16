@@ -317,4 +317,7 @@ public class JsonRpcHttpClient
 		this.hostNameVerifier = hostNameVerifier;
 	}
 
+	public void setHeaderResolvers(List<HttpHeaderResolver> headerResolvers) {
+		this.headerResolvers = headerResolvers;
+	}
 }
