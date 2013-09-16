@@ -11,7 +11,7 @@
 		<jdk.version>1.6</jdk.version>
 		<!-- deps versions -->
 		<spring.version>3.1.2.RELEASE</spring.version>
-		<jackson.version>2.0.2</jackson.version>
+		<jackson.version>2.2.3</jackson.version>
 		<servlet.version>3.1-b06</servlet.version>
 		<portlet.version>2.0</portlet.version>
 		<commons.codec.version>1.4</commons.codec.version>
