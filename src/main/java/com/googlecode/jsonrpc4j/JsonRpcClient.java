@@ -391,8 +391,17 @@ public class JsonRpcClient {
 
 		// map args
 		} else if (arguments!=null && Map.class.isInstance(arguments)) {
-			if (!Map.class.cast(arguments).isEmpty()) {
-				request.put("params", mapper.valueToTree(arguments));
+			Map<String, ?> args = Map.class.cast(arguments);
+			if (!args.isEmpty()) {
+				// serialize every param for itself so jackson can determine
+				// right serializer
+				ObjectNode paramsNode = new ObjectNode(mapper.getNodeFactory());
+				for (String key : args.keySet()) {
+					Object value = args.get(key);
+					JsonNode argNode = mapper.valueToTree(value);
+					paramsNode.put(key, argNode);
+				}
+				request.put("params", paramsNode);
 			}
 
 		// other args
