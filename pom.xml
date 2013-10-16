@@ -2,7 +2,7 @@
 	<modelVersion>4.0.0</modelVersion>
 	<groupId>com.github.esz</groupId>
 	<artifactId>jsonrpc</artifactId>
-	<version>0.0.5-SNAPSHOT</version>
+	<version>0.0.5</version>
 
 	<properties>
 		<!-- project properties -->
@@ -46,7 +46,7 @@
 	<scm>
 		<connection>scm:git:https://github.com/esz/jsonrpc.git</connection>
 		<developerConnection>scm:git:git@github.com:esz/jsonrpc.git</developerConnection>
-		<tag>HEAD</tag>
+		<tag>jsonrpc-0.0.5</tag>
 	</scm>
 
 	<build>
